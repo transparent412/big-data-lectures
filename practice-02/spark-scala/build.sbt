@@ -11,5 +11,7 @@ lazy val root = project
 
     libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
     // https://mvnrepository.com/artifact/org.apache.spark/spark-core
-    libraryDependencies += "org.apache.spark" %% "spark-core" % "3.1.1"
-)
+    libraryDependencies += "org.apache.spark" %% "spark-core" % "3.1.1",
+    libraryDependencies += "org.apache.spark" %% "spark-sql" % "3.1.1",
+    libraryDependencies += "org.apache.spark" %% "spark-streaming" % "3.1.1"
+  )
