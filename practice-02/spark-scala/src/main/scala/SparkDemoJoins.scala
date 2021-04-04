@@ -29,13 +29,15 @@ object SparkDemoJoins {
 
     citiesDF.show()
 //
-    val joined = peopleDF.as("people").join(citiesDF.as("cities")
-      , peopleDF("city") <=> citiesDF("city"), "inner"
-    ).select("first_name", "people.city", "country", "population")
+    val joined =
+      peopleDF.as("people").join(citiesDF.as("cities")
+      , peopleDF("city") <=> citiesDF("city"), "inner")
+        .filter($"people.city" === "medellin")
+        .select("first_name", "people.city", "country", "population")
 
-    joined.explain(mode="formatted")
-//    joined.explain(extended=true)
-//      .show()
+//    joined.explain(mode="formatted")
+    joined.explain(extended = true)
+//      joined.show()
 //
 //    Thread.sleep(10 * 60 * 1000)
   }

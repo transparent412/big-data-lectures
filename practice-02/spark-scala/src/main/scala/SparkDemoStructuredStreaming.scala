@@ -19,13 +19,16 @@ object SparkDemoStructuredStreaming {
       .load()
 
     // Split the lines into words
-    val words = lines.as[String].flatMap(_.split(" "))
-
+    val words = lines.as[String]
+//        .flatMap(x => x.split(" "))
+          .flatMap(_.split(" "))
 
     // Generate running word count
     val wordCounts = words
       .withWatermark("timestamp", "10 minutes")
-      .groupBy(window($"timestamp", "10 minutes", "5 minutes"), $"value")
+      .groupBy(
+        window($"timestamp", "5 seconds", "5 seconds"),
+        $"value")
       .count()
 
     val query = wordCounts.writeStream

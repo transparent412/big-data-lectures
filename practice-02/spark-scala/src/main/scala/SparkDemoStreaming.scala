@@ -1,5 +1,4 @@
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 object SparkDemoStreaming {
@@ -13,33 +12,36 @@ object SparkDemoStreaming {
       .setAppName("NetworkWordCount")
     val ssc = new StreamingContext(conf, Seconds(5))
 
-    val lines = ssc.socketTextStream("localhost", 9999)
+    val lines = ssc
+      .socketTextStream("localhost", 9999)
 
-//    val pairs = lines.map(word => (word, 1))
-//    val wordCounts = pairs.reduceByKey(_ + _)
-//    wordCounts.print()
+    lines
+      .flatMap(x => x.split(" "))
+      .map(word => (word, 1))
+      .reduceByKey(_ + _)
+      .print()
 
-    lines.flatMap(line => line.split(" "))
-      .foreachRDD { rdd =>
-        val spark = SparkSession.builder.config(rdd.sparkContext.getConf).getOrCreate()
-        import spark.implicits._
+    //    lines.flatMap(line => line.split(" "))
+    //      .foreachRDD { rdd =>
+    //        val spark = SparkSession.builder.config(rdd.sparkContext.getConf).getOrCreate()
+    //        import spark.implicits._
+    //
+    //        // Convert RDD[String] to DataFrame
+    //        val wordsDataFrame = rdd.toDF("word")
+    //
+    //        // Create a temporary view
+    //        wordsDataFrame.createOrReplaceTempView("words")
+    //
+    //        // Do word count on DataFrame using SQL and print it
+    //        val wordCountsDataFrame =
+    //          spark.sql("select word, count(*) as total " +
+    //            "from words " +
+    //            "group by word " +
+    //            "order by total desc")
+    //        wordCountsDataFrame.show()
+    //      }
 
-        // Convert RDD[String] to DataFrame
-        val wordsDataFrame = rdd.toDF("word")
-
-        // Create a temporary view
-        wordsDataFrame.createOrReplaceTempView("words")
-
-        // Do word count on DataFrame using SQL and print it
-        val wordCountsDataFrame =
-          spark.sql("select word, count(*) as total " +
-            "from words " +
-            "group by word " +
-            "order by total desc")
-        wordCountsDataFrame.show()
-      }
-
-    ssc.start()             // Start the computation
-    ssc.awaitTermination()  // Wait for the computation to terminate
+    ssc.start() // Start the computation
+    ssc.awaitTermination() // Wait for the computation to terminate
   }
 }
